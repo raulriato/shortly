@@ -13,4 +13,13 @@ async function isValidSignIn(email, password) {
     return isValidPassword;
 };
 
-export { isValidSignIn };
+async function isValidSignUp(email) {
+    const user = await connection.query('SELECT * FROM users WHERE email = $1', [email]);
+
+    return user.rowCount === 0;
+};
+
+export {
+    isValidSignIn,
+    isValidSignUp
+};

@@ -1,7 +1,33 @@
-import { unauthorizedResponse, unprocessableResponse } from "../common/responses.js";
-import { isValidSignIn } from "../repositories/authentication.repository.js";
-import { signInSchema } from "../schemas/authentication.schema.js";
+import { conflictResponse, unauthorizedResponse, unprocessableResponse } from "../common/responses.js";
+import { isValidSignIn, isValidSignUp } from "../repositories/authentication.repository.js";
+import { signInSchema, signUpSchema } from "../schemas/authentication.schema.js";
 import { validateSchema } from "./middlewaresHelpers/schemas.validation.js";
+
+async function signUpMiddleware(req, res, next) {
+    const { name, email, password, confirmPassword } = req.body;
+
+    const messages = validateSchema(signUpSchema, {
+        name,
+        email,
+        password,
+        confirmPassword
+    });
+    if (messages) {
+        return unprocessableResponse(res, messages);
+    };
+
+    if (!isValidSignUp) {
+        return conflictResponse(res, 'invalid information');
+    };
+
+    res.locals.signUp = {
+        name,
+        email,
+        password
+    };
+
+    next();
+}
 
 async function signInMiddleware(req, res, next) {
     const { email, password } = req.body;
@@ -11,7 +37,7 @@ async function signInMiddleware(req, res, next) {
         return unprocessableResponse(res, messages);
     };
 
-    if (!isValidSignIn(email)) {
+    if (!isValidSignIn(email, password)) {
         return unauthorizedResponse(res, 'invalid information');
     };
 
