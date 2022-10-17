@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 async function signUpMiddleware(req, res, next) {
     const { name, email, password, confirmPassword } = req.body;
 
-    const messages = validateSchema(signUpSchema, {
+    const messages = await validateSchema(signUpSchema, {
         name,
         email,
         password,
@@ -18,7 +18,7 @@ async function signUpMiddleware(req, res, next) {
         return unprocessableResponse(res, messages);
     };
 
-    const newUser = verifyUser(email);
+    const newUser = await verifyUser(email, name);
 
     if (newUser.rowCount > 0) {
         return conflictResponse(res, 'invalid information');
@@ -49,7 +49,11 @@ async function signInMiddleware(req, res, next) {
         return unauthorizedResponse(res, 'invalid information');
     };
 
-    res.locals.signIn = { email, password };
+    res.locals.signIn = {
+        email,
+        userId: user.rows[0].id,
+        userName: user.rows[0].name
+    };
 
     next();
 };

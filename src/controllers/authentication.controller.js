@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { createdResponse, unauthorizedResponse } from '../common/responses.js';
-import { insertUser } from '../repositories/authentication.repository.js';
+import { insertSession, insertUser, updateSession, verifySession } from '../repositories/authentication.repository.js';
 
 
 async function signUp(req, res) {
@@ -11,11 +11,43 @@ async function signUp(req, res) {
 
     const newUser = await insertUser(res, name, email, hashPassword);
 
-    if(newUser.rowCount === 0) {
+    if (newUser.rowCount === 0) {
         return unauthorizedResponse(res, 'invalid information');
     };
 
     return createdResponse(res, 'ok');
 };
 
-export { signUp };
+async function signIn(req, res) {
+    const { email, userId, userName } = res.locals.signIn;
+
+    const token = jwt.sign(
+        {
+            userId
+        },
+        userName
+    );
+
+    const activeSession = await verifySession(res, userId);
+
+    if (activeSession.rowCount > 0) {
+        const updatedSession = await updateSession(res, userId, token);
+
+        if (updatedSession.rowCount === 0) {
+            return unauthorizedResponse(res, 'invalid information');
+        };
+    } else {
+        const newSession = await insertSession(res, userId, token);
+
+        if (newSession.rowCount === 0) {
+            return unauthorizedResponse(res, 'invalid information');
+        };
+    };
+
+    return createdResponse(res, { token });
+}
+
+export {
+    signUp,
+    signIn
+};
