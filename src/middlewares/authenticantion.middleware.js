@@ -18,7 +18,7 @@ async function signUpMiddleware(req, res, next) {
         return unprocessableResponse(res, messages);
     };
 
-    const newUser = await verifyUser(email, name);
+    const newUser = await verifyUser(res, email, name);
 
     if (newUser.rowCount > 0) {
         return conflictResponse(res, 'invalid information');
@@ -41,7 +41,7 @@ async function signInMiddleware(req, res, next) {
         return unprocessableResponse(res, messages);
     };
 
-    const user = await validateUser(email, password);
+    const user = await validateUser(res, email, password);
 
     const isValidPassword = bcrypt.compareSync(password, user.rows[0].password);
 

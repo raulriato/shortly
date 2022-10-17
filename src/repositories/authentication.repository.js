@@ -2,7 +2,7 @@ import { connection } from "../database/db.js";
 import bcrypt from 'bcrypt';
 import { serverErrorResponse } from "../common/responses.js";
 
-async function validateUser(email, password) {
+async function validateUser(res, email, password) {
 
     try {
         const user = await connection.query('SELECT * FROM users WHERE email = $1;', [email]);
@@ -13,7 +13,7 @@ async function validateUser(email, password) {
     };
 };
 
-async function verifyUser(email, name) {
+async function verifyUser(res, email, name) {
     try {
         const user = await connection.query('SELECT * FROM users WHERE email = $1 OR name = $2;', [email, name]);
 

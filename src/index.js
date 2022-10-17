@@ -13,8 +13,8 @@ app.use(express.json());
 app.use(cors());
 
 app.use(authenticationRouter);
-app.use(urlsRouter);
 app.use(usersRouter);
+app.use(urlsRouter);
 
 app.get('/status', (req, res) => res.status(200).send('ok'));
 

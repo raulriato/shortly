@@ -1,6 +1,6 @@
 import { notFoundResponse, okResponse, serverErrorResponse } from "../common/responses.js";
 import { getUserUrls } from "../repositories/urls.repository.js";
-import { selectUser } from "../repositories/users.repository.js";
+import { selectRanking, selectUser } from "../repositories/users.repository.js";
 
 async function getUser(req, res) {
     const userId = res.locals.userId;
@@ -23,4 +23,21 @@ async function getUser(req, res) {
     };
 };
 
-export { getUser };
+async function listRanking(req, res) {
+    try {
+        const ranking = await selectRanking(res);
+
+        if (ranking.rowCount === 0) {
+            return notFoundResponse(res, 'ranking not found');
+        };
+
+        return okResponse(res, ranking.rows);
+    } catch (error) {
+        return serverErrorResponse(res, error);
+    }
+}
+
+export {
+    getUser,
+    listRanking
+};
