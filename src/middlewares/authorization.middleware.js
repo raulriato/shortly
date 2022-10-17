@@ -1,5 +1,5 @@
 import { unauthorizedResponse } from "../common/responses.js";
-import { validateSession, verifyUserBySession } from "../repositories/authentication.repository.js";
+import { validateSession, verifyUserBySession } from "../repositories/authorization.repository.js";
 
 async function authorizationMiddleware(req, res, next) {
     const token = req.headers.authorization?.replace('Bearer ', '');
