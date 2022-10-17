@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
-import { conflictResponse, createdResponse, notFoundResponse, okResponse } from '../common/responses.js';
-import { getUrl, insertUrl, selectUrl } from '../repositories/urls.repository.js';
-import { insertVisit } from '../repositories/visits.repository.js';
+import { conflictResponse, createdResponse, noContentResponse, notFoundResponse, okResponse, serverErrorResponse } from '../common/responses.js';
+import { deleteUrl, getUrl, insertUrl, selectUrl } from '../repositories/urls.repository.js';
+import { deleteVisitsFromUrl, insertVisit, selectVisitsByUrl } from '../repositories/visits.repository.js';
 
 async function createUrl(req, res) {
     const url = res.locals.url;
@@ -15,12 +15,12 @@ async function createUrl(req, res) {
         return conflictResponse(res, 'unable to insert url');
     };
 
-    return createdResponse(res, {shortUrl});
+    return createdResponse(res, { shortUrl });
 };
 
 async function showUrl(req, res) {
     const { id } = req.params;
-    
+
     const url = await selectUrl(res, id);
 
     if (url.rowCount === 0) {
@@ -35,7 +35,7 @@ async function goToUrl(req, res) {
 
     const url = await getUrl(res, shortUrl);
 
-    if(url.rowCount === 0) {
+    if (url.rowCount === 0) {
         return notFoundResponse(res, 'url not found');
     };
 
@@ -46,10 +46,33 @@ async function goToUrl(req, res) {
     };
 
     return res.redirect(url.rows[0].url);
+};
+
+async function removeUrl(req, res) {
+    const urlId = res.locals.urlId;
+
+    try {
+        const visitsToThisUrl = await selectVisitsByUrl(res, urlId);
+
+        if (visitsToThisUrl.rowCount > 0) {
+            await deleteVisitsFromUrl(res, urlId);
+        };
+
+        const deletedUrl = await deleteUrl(res, urlId);
+
+        if (deletedUrl.rowCount === 0) {
+            return notFoundResponse(res, 'not found');
+        };
+
+        return noContentResponse(res, 'deleted');
+    } catch (error) {
+        return serverErrorResponse(res, error);
+    }
 }
 
 export {
     createUrl,
     showUrl,
-    goToUrl
+    goToUrl,
+    removeUrl
 }

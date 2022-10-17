@@ -11,6 +11,28 @@ async function insertVisit(res, urlId) {
     }
 };
 
+async function deleteVisitsFromUrl(res, urlId) {
+    try {
+        const visits = await connection.query('DELETE FROM visits WHERE url_id = $1;', [urlId]);
+
+        return visits;
+    } catch (error) {
+        return serverErrorResponse(res, error);
+    }
+};
+
+async function selectVisitsByUrl(res, urlId) {
+    try {
+        const visit = await connection.query('SELECT * FROM visits WHERE url_id = $1;', [urlId]);
+
+        return visit;
+    } catch (error) {
+        return serverErrorResponse(res, error);
+    }
+};
+
 export {
-    insertVisit
+    insertVisit,
+    deleteVisitsFromUrl,
+    selectVisitsByUrl
 }

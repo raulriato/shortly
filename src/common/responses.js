@@ -27,6 +27,10 @@ function okResponse(res, body) {
     return res.status(200).send(body);
 };
 
+function noContentResponse(res, body) {
+    return res.status(204).send(body);
+};
+
 export {
     serverErrorResponse,
     unprocessableResponse,
@@ -34,5 +38,6 @@ export {
     unauthorizedResponse,
     notFoundResponse,
     createdResponse,
-    okResponse
+    okResponse,
+    noContentResponse
 }

@@ -43,11 +43,33 @@ async function getUserUrls(res, userId) {
     } catch (error) {
         return serverErrorResponse(res, error);
     }
+};
+
+async function deleteUrl(res, urlId) {
+    try {
+        const deletedUrl = await connection.query('DELETE FROM urls WHERE id = $1;', [urlId]);
+
+        return deletedUrl;
+    } catch (error) {
+        return serverErrorResponse(res, error);
+    }
+};
+
+async function getUrlById(res, urlId) {
+    try {
+        const url = await connection.query('SELECT * FROM urls WHERE id = $1;', [urlId]);
+
+        return url;
+    } catch (error) {
+        return serverErrorResponse(res, error);
+    }
 }
 
 export {
     insertUrl,
     selectUrl,
     getUrl,
-    getUserUrls
+    getUserUrls,
+    deleteUrl,
+    getUrlById
 }
