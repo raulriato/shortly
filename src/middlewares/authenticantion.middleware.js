@@ -1,7 +1,8 @@
 import { conflictResponse, unauthorizedResponse, unprocessableResponse } from "../common/responses.js";
-import { isValidSignIn, isValidSignUp } from "../repositories/authentication.repository.js";
+import { validateUser, verifyUser } from "../repositories/authentication.repository.js";
 import { signInSchema, signUpSchema } from "../schemas/authentication.schema.js";
 import { validateSchema } from "./middlewaresHelpers/schemas.validation.js";
+import bcrypt from 'bcrypt';
 
 async function signUpMiddleware(req, res, next) {
     const { name, email, password, confirmPassword } = req.body;
@@ -12,11 +13,14 @@ async function signUpMiddleware(req, res, next) {
         password,
         confirmPassword
     });
+
     if (messages) {
         return unprocessableResponse(res, messages);
     };
 
-    if (!isValidSignUp) {
+    const newUser = verifyUser(email);
+
+    if (newUser.rowCount > 0) {
         return conflictResponse(res, 'invalid information');
     };
 
@@ -32,12 +36,16 @@ async function signUpMiddleware(req, res, next) {
 async function signInMiddleware(req, res, next) {
     const { email, password } = req.body;
 
-    const messages = validateSchema(signInSchema, { email, password });
+    const messages = await validateSchema(signInSchema, { email, password });
     if (messages) {
         return unprocessableResponse(res, messages);
     };
 
-    if (!isValidSignIn(email, password)) {
+    const user = await validateUser(email, password);
+
+    const isValidPassword = bcrypt.compareSync(password, user.rows[0].password);
+
+    if (user.rowCount === 0 || !isValidPassword) {
         return unauthorizedResponse(res, 'invalid information');
     };
 
@@ -45,3 +53,8 @@ async function signInMiddleware(req, res, next) {
 
     next();
 };
+
+export {
+    signUpMiddleware,
+    signInMiddleware
+}

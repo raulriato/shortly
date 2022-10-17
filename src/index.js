@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authenticationRouter from './routers/authentication.router.js'
 
 dotenv.config();
 
@@ -8,6 +9,8 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
+
+app.use(authenticationRouter);
 
 app.get('/status', (req, res) => res.status(200).send('ok'));
 
