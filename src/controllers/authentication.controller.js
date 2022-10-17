@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import { createdResponse, unauthorizedResponse } from '../common/responses.js';
 import { insertSession, insertUser, updateSession, verifySession } from '../repositories/authentication.repository.js';
 
+dotenv.config();
 
 async function signUp(req, res) {
     const { name, email, password } = res.locals.signUp;
@@ -25,7 +27,7 @@ async function signIn(req, res) {
         {
             userId
         },
-        'SHORTLY'
+        process.env.TOKEN_SECRET
     );
 
     const activeSession = await verifySession(res, userId);
