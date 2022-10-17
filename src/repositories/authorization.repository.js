@@ -1,18 +1,9 @@
 import { connection } from "../database/db.js";
 
-async function verifyUserBySession(res, userId) {
-    try {
-        const user = connection.query('SELECT * FROM users WHERE id = $1;' [userId]);
-
-        return user;
-    } catch (error) {
-        return serverErrorResponse(res, error);
-    }
-};
-
 async function validateSession(res, token) {
+    console.log(token);
     try {
-        const session = connection.query('SELECT * FROM sessions WHERE token = $1;', [token]);
+        const session = await connection.query('SELECT * FROM sessions WHERE token = $1 AND valid = true;', [token]);
 
         return session;
     } catch (error) {
@@ -21,6 +12,5 @@ async function validateSession(res, token) {
 };
 
 export {
-    verifyUserBySession,
     validateSession
 }

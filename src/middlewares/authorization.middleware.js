@@ -1,10 +1,13 @@
+import jwt from 'jsonwebtoken';
 import { unauthorizedResponse } from "../common/responses.js";
-import { validateSession, verifyUserBySession } from "../repositories/authorization.repository.js";
+import { validateSession } from "../repositories/authorization.repository.js";
 
 async function authorizationMiddleware(req, res, next) {
     const token = req.headers.authorization?.replace('Bearer ', '');
 
-    if (!token) {
+    const verifiedToken = jwt.verify(token, 'SHORTLY');
+
+    if (!verifiedToken) {
         return unauthorizedResponse(res, 'unauthorized');
     };
 
@@ -14,16 +17,7 @@ async function authorizationMiddleware(req, res, next) {
         return unauthorizedResponse(res, 'unauthorized');
     };
 
-    const user = await verifyUserBySession(res, session.rows[0].user_id);
-
-    if (user.rowCount === 0) {
-        return unauthorizedResponse(res, 'unauthorized');
-    };
-
-    res.locals.user = {
-        id: user.rows[0].id,
-        name: user.rows[0].name
-    };
+    res.locals.userId = verifiedToken.userId;
 
     next();
 };

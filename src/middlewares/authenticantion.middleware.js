@@ -50,8 +50,7 @@ async function signInMiddleware(req, res, next) {
     };
 
     res.locals.signIn = {
-        userId: user.rows[0].id,
-        userName: user.rows[0].name
+        userId: user.rows[0].id
     };
 
     next();

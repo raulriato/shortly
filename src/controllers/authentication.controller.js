@@ -19,13 +19,13 @@ async function signUp(req, res) {
 };
 
 async function signIn(req, res) {
-    const { userId, userName } = res.locals.signIn;
+    const { userId } = res.locals.signIn;
 
     const token = jwt.sign(
         {
             userId
         },
-        userName
+        'SHORTLY'
     );
 
     const activeSession = await verifySession(res, userId);
