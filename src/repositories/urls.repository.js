@@ -30,10 +30,21 @@ async function selectUrl(res, id) {
     } catch (error) {
         return serverErrorResponse(res, error);
     }
-}
+};
+
+async function getUrl(res, shortUrl) {
+    try {
+        const url = await connection.query('SELECT id, url FROM urls WHERE short_url = $1;', [shortUrl]);
+
+        return url;
+    } catch (error) {
+        return serverErrorResponse(res, error);
+    }
+};
 
 export {
     verifyUrl,
     insertUrl,
-    selectUrl
+    selectUrl,
+    getUrl
 }
