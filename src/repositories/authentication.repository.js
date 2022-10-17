@@ -33,6 +33,16 @@ async function insertUser(res, name, email, password) {
     }
 };
 
+async function verifyUserBySession(res, userId) {
+    try {
+        const user = connection.query('SELECT * FROM users WHERE id = $1;' [userId]);
+
+        return user;
+    } catch (error) {
+        return serverErrorResponse(res, error);
+    }
+}
+
 async function verifySession(res, userId) {
     try {
         const session = await connection.query('SELECT * FROM sessions WHERE user_id = $1 AND valid = true;', [userId]);
@@ -42,6 +52,16 @@ async function verifySession(res, userId) {
         return serverErrorResponse(res, error);
     }
 };
+
+async function validateSession(res, token) {
+    try {
+        const session = connection.query('SELECT * FROM sessions WHERE token = $1;', [token]);
+
+        return session;
+    } catch (error) {
+        return serverErrorResponse(res, error)
+    }
+}
 
 async function updateSession(res, userId, token) {
     try {
@@ -69,5 +89,7 @@ export {
     insertUser,
     insertSession,
     verifySession,
-    updateSession
+    updateSession,
+    validateSession,
+    verifyUserBySession
 };

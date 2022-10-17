@@ -19,7 +19,7 @@ async function signUp(req, res) {
 };
 
 async function signIn(req, res) {
-    const { email, userId, userName } = res.locals.signIn;
+    const { userId, userName } = res.locals.signIn;
 
     const token = jwt.sign(
         {
