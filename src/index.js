@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authenticationRouter from './routers/authentication.router.js';
 import urlsRouter from './routers/urls.router.js';
+import usersRouter from './routers/users.router.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(cors());
 
 app.use(authenticationRouter);
 app.use(urlsRouter);
+app.use(usersRouter);
 
 app.get('/status', (req, res) => res.status(200).send('ok'));
 
